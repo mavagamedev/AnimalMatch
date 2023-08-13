@@ -297,7 +297,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
-  m_ApplyToSortingLayers: 00000000
+  m_ApplyToSortingLayers: 000000009dfeaf96
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -371,9 +371,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5f05f9bb81932b4c9ade4e4491de36b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sizeColumn: 5
-  sizeRow: 9
-  pieceObject: {fileID: 7674926519932778934, guid: be69da10148c340438a68a09adef8b45, type: 3}
+  sizeOffset: 0
+  verticalOffset: 0
+  sizeColumn: 4
+  sizeRow: 4
+  emptyObject: {fileID: 7674926519932778934, guid: be69da10148c340438a68a09adef8b45, type: 3}
+  animalPieces:
+  - {fileID: 6854760892105406515, guid: e8f562cce304a39488ed0928dc0c187e, type: 3}
+  - {fileID: 6518777264903902592, guid: 607de1eda0163c34aab667320c5bb044, type: 3}
+  - {fileID: 5382858807028330562, guid: 9b4f456b60a034045a3a6d3f325a07db, type: 3}
+  - {fileID: 3499419180340367522, guid: ba26ad08d4975a24997020cc2b99ba09, type: 3}
+  - {fileID: 2802962289131546913, guid: 64287303b020ec34aa8c78202b1ea870, type: 3}
+  - {fileID: 6665582788238340979, guid: 8bc63fb4462603042a897fd011a4cbba, type: 3}
+  - {fileID: 460262862394829295, guid: 8f5113bd9cdb9934f87be3bb23b581ba, type: 3}
+  - {fileID: 650407974769481782, guid: af3741254e7ca8e40aebbe240738b7da, type: 3}
+  - {fileID: 2463411070538445107, guid: 9e6ac17ef7f520747987e5a23ea7281c, type: 3}
 --- !u!4 &942962849
 Transform:
   m_ObjectHideFlags: 0

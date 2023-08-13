@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using UnityEngine;
 
 public class Board : MonoBehaviour
@@ -8,38 +7,68 @@ public class Board : MonoBehaviour
     [SerializeField] private float verticalOffset;
 
     [Header("Config Board")]
-    [SerializeField] private float sizeColumn, sizeRow;
+    [SerializeField] private int sizeColumn;
+    [SerializeField] private int sizeRow;
     [SerializeField] private GameObject emptyObject;
     [SerializeField] private GameObject[] animalPieces;
     
+    [Header("Swap Pieces")] 
+    public Piece startPiece;
+    public Piece endPiece;
+    private Piece[,] _pieces;
+
     private void Start()
     {
+        _pieces = new Piece[sizeColumn, sizeRow];
         TravelBoard(true);
-        ResizeCamera();
+        ConfigCamera();
         TravelBoard();
     }
 
     private void TravelBoard(bool isEmpty=false)
     {
-        var halfRow  = (sizeRow/2)-0.5f ;
-        var halfColumn  = (sizeColumn/2)-0.5f ;
-
-        for (var x = -halfColumn ; x <= halfColumn ; x++)
+        for (var x = 0 ; x < sizeColumn ; x++)
         {
-            for (var y = -halfRow+verticalOffset ; y <= halfRow+verticalOffset ; y++)
+            for (var y = 0 ; y < sizeRow ; y++)
             {
                 var pieceObject = isEmpty ? emptyObject : animalPieces[Random.Range(0, animalPieces.Length)];
-                var piece = Instantiate(pieceObject, new Vector2(x, y), Quaternion.identity);
+                
+                var piece = Instantiate(pieceObject, new Vector2(x, y+verticalOffset), Quaternion.identity);
                 piece.transform.parent = transform;
-                piece.GetComponent<Piece>()?.SetInformation(x+2.5f,y+2.5f,this);
+                
+                if (isEmpty) continue;
+                _pieces[x, y] = piece.GetComponent<Piece>();
+                _pieces[x, y]?.SetInformation(x,y);
             }
         }
     }
 
-    private void ResizeCamera()
+    private void ConfigCamera()
     {
-        var verticalSize = (sizeRow / 2)+0.5f;
+        // Position Camera
+        var posCameraX = (sizeColumn / 2f)-0.5f;
+        var posCameraY = (sizeRow / 2f)-0.5f;
+        Camera.main!.transform.position = new Vector3(posCameraX,posCameraY,-10);
+        
+        // Resize Camera
+        var verticalSize = (sizeRow / 2f)+0.5f;
         Camera.main!.orthographicSize =
             (sizeColumn > verticalSize ? sizeColumn : verticalSize)+sizeOffset;
+    }
+
+    public void SwapPieces()
+    {
+        if (startPiece && endPiece)
+        {
+            _pieces[startPiece.positionX, startPiece.positionY] = endPiece;
+            _pieces[endPiece.positionX, endPiece.positionY] = startPiece;
+            
+            var firstPiece = startPiece;
+            
+            startPiece.MovePiece(endPiece.positionX, endPiece.positionY);
+            endPiece.MovePiece(firstPiece.positionX, firstPiece.positionY);
+        }
+        startPiece = null;
+        endPiece = null;
     }
 }

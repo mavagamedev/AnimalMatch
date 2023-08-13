@@ -373,8 +373,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sizeOffset: 0
   verticalOffset: 0
-  sizeColumn: 4
-  sizeRow: 4
+  sizeColumn: 5
+  sizeRow: 5
   emptyObject: {fileID: 7674926519932778934, guid: be69da10148c340438a68a09adef8b45, type: 3}
   animalPieces:
   - {fileID: 6854760892105406515, guid: e8f562cce304a39488ed0928dc0c187e, type: 3}
@@ -386,6 +386,8 @@ MonoBehaviour:
   - {fileID: 460262862394829295, guid: 8f5113bd9cdb9934f87be3bb23b581ba, type: 3}
   - {fileID: 650407974769481782, guid: af3741254e7ca8e40aebbe240738b7da, type: 3}
   - {fileID: 2463411070538445107, guid: 9e6ac17ef7f520747987e5a23ea7281c, type: 3}
+  startPiece: {fileID: 0}
+  endPiece: {fileID: 0}
 --- !u!4 &942962849
 Transform:
   m_ObjectHideFlags: 0

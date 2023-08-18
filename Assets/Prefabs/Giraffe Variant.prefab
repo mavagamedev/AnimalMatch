@@ -61,6 +61,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6464829242106585397, guid: 1c3f57cf4736af047b73c5fdc616e1b4, type: 3}
+      propertyPath: animalType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6464829242106585397, guid: 1c3f57cf4736af047b73c5fdc616e1b4, type: 3}
       propertyPath: animalPiece
       value: 1
       objectReference: {fileID: 0}

@@ -373,8 +373,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sizeOffset: 0
   verticalOffset: 0
-  sizeColumn: 5
-  sizeRow: 5
+  sizeColumn: 6
+  sizeRow: 10
   emptyObject: {fileID: 7674926519932778934, guid: be69da10148c340438a68a09adef8b45, type: 3}
   animalPieces:
   - {fileID: 6854760892105406515, guid: e8f562cce304a39488ed0928dc0c187e, type: 3}

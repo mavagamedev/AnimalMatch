@@ -61,8 +61,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6464829242106585397, guid: 1c3f57cf4736af047b73c5fdc616e1b4, type: 3}
+      propertyPath: animalType
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6464829242106585397, guid: 1c3f57cf4736af047b73c5fdc616e1b4, type: 3}
       propertyPath: animalPiece
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 6901489763476349317, guid: 1c3f57cf4736af047b73c5fdc616e1b4, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 0.95
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

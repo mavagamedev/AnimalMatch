@@ -6,8 +6,8 @@ public class Piece : MonoBehaviour
     private Board _board;
 
     [Header("Piece information")]
-    public int positionX, positionY;
-    public Animal animalPiece;
+    public int posX, posY;
+    public Animal animalType;
     
     public enum Animal
     {
@@ -19,10 +19,10 @@ public class Piece : MonoBehaviour
         _board = FindObjectOfType<Board>();
     }
 
-    public void SetInformation(int posX, int posY)
+    public void SetInformation(int positionX, int positionY)
     {
-        positionX = posX;
-        positionY = posY;
+        posX = positionX;
+        posY = positionY;
     }
 
     public void MovePiece(int desX, int desY)
@@ -30,23 +30,23 @@ public class Piece : MonoBehaviour
         transform.DOMove(new Vector3(desX, desY, transform.position.z), 0.25f)
             .SetEase(Ease.InOutCubic).onComplete = () =>
         {
-            positionX = desX;
-            positionY = desY;
+            posX = desX;
+            posY = desY;
         };
     }
 
     private void OnMouseDown()
     {
-        _board.startPiece = this;
+        _board.startTile = this;
     }
 
     private void OnMouseOver()
     {
-        _board.endPiece = this;
+        _board.endTile = this;
     }
 
     private void OnMouseUp()
     {
-        _board.SwapPieces();
+        StartCoroutine(_board.SwapPieces());
     }
 }

@@ -63,10 +63,10 @@ public class Board : MonoBehaviour
                CreatePieceAt(x,y);
                
                var currIntento = 0;
-               const int maxIntentos = 5;
+               const int maxAttempts = 5;
                while (HasPreviousMatches(x,y))
                {
-                   if(currIntento>maxIntentos) break;
+                   if(currIntento>=maxAttempts) break;
                    
                    ClearPieceAt(_pieces[x,y]);
                    CreatePieceAt(x, y);
@@ -94,8 +94,8 @@ public class Board : MonoBehaviour
     
     private bool HasPreviousMatches(int posX, int posY)
     {
-        var leftMatchs = GetMatchByDirection(posX, posY, Vector2.left,2);
-        var downMatchs = GetMatchByDirection(posX, posY, Vector2.down,2);
+        var leftMatchs = GetMatchByDirection(posX, posY, Vector2.left, 2);
+        var downMatchs = GetMatchByDirection(posX, posY, Vector2.down, 2);
         return leftMatchs.Count > 0 || downMatchs.Count > 0;
     }
 
@@ -117,12 +117,11 @@ public class Board : MonoBehaviour
         var startPieceMatchs = GetMatchByPiece(startPiece.posX, startPiece.posY);
         var endPieceMatchs = GetMatchByPiece(endPiece.posX, endPiece.posY);
             
-        var foundMatch = startPieceMatchs.Count>0 || endPieceMatchs.Count>0;
+        var allMatches = startPieceMatchs.Union(endPieceMatchs).ToList();
         
-        if (foundMatch)
+        if (allMatches.Count>0)
         {    
-            startPieceMatchs.ForEach(ClearPieceAt);
-            endPieceMatchs.ForEach(ClearPieceAt);
+            ClearPieces(allMatches);
         }
         else
         {
@@ -138,6 +137,52 @@ public class Board : MonoBehaviour
         _swappingPieces = false;
         
         yield return null; 
+    }
+
+    private void ClearPieces(List<Piece> piecesToClear)
+    {
+        piecesToClear.ForEach(ClearPieceAt);
+        List<int> columnsMatches = GetColumnsMatches(piecesToClear); 
+        CollapseColumns(columnsMatches, 0.5f); 
+        
+    }
+
+    private List<int> GetColumnsMatches(List<Piece> piecesOfColumns)
+    {
+        var columns = new List<int>();
+        piecesOfColumns.ForEach(piece =>
+        {
+            if (columns.Contains(piece.posX)) return;
+            columns.Add(piece.posX);
+        });
+        return columns;
+    }
+
+    private void CollapseColumns(List<int> columns, float timeToCollapse)
+    {
+        List<Piece> movingPieces = new List<Piece>();
+
+        foreach (var posColumn in columns)
+        {
+            for (var posRow = 0; posRow < sizeRow; posRow++)
+            {
+                if (_pieces[posColumn, posRow]) continue;
+                
+                for (var posRowNext = posRow; posRowNext < sizeRow; posRowNext++)
+                {
+                    if (!_pieces[posColumn, posRowNext]) continue;
+                        
+                    _pieces[posColumn,posRowNext].MovePiece(posColumn,posRow);
+                    _pieces[posColumn, posRowNext] = null;
+                    
+                    if (!movingPieces.Contains(_pieces[posColumn, posRow]))
+                    {
+                        movingPieces.Add(_pieces[posColumn,posRow]);
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     private bool IsPosibleMove()
@@ -163,11 +208,7 @@ public class Board : MonoBehaviour
             if (nextX < 0 || nextX >= sizeColumn || nextY < 0 || nextY >= sizeRow) continue;
             
             var nextPiece = _pieces[nextX, nextY];
-            if (nextPiece && nextPiece.animalType == startPieceMatch.animalType)
-            {
-                print($"MATCH: {startPieceMatch.animalType}[{piecePosX}, {piecePosY}] --- {nextPiece.animalType}[{nextX}, {nextY}]");
-                matches.Add(nextPiece);
-            }
+            if (nextPiece && nextPiece.animalType == startPieceMatch.animalType) matches.Add(nextPiece);
             else break;
         }
 

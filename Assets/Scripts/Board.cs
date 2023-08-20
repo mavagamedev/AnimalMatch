@@ -21,7 +21,7 @@ public class Board : MonoBehaviour
     public Piece startTile;
     public Piece endTile;
     private Piece[,] _pieces;
-    private bool _swappingPieces;
+    public bool _swappingPieces;
 
     private void Start()
     {
@@ -102,6 +102,7 @@ public class Board : MonoBehaviour
     public IEnumerator SwapPieces()
     {
         if (!startTile || !endTile || !IsPosibleMove() || _swappingPieces) yield break;
+        _swappingPieces = true;
 
         var startPiece = _pieces[startTile.posX, startTile.posY];
         var endPiece = _pieces[endTile.posX, endTile.posY];
@@ -160,7 +161,7 @@ public class Board : MonoBehaviour
 
     private void CollapseColumns(List<int> columns, float timeToCollapse)
     {
-        List<Piece> movingPieces = new List<Piece>();
+        var movingPieces = new List<Piece>();
 
         foreach (var posColumn in columns)
         {
@@ -168,11 +169,12 @@ public class Board : MonoBehaviour
             {
                 if (_pieces[posColumn, posRow]) continue;
                 
-                for (var posRowNext = posRow; posRowNext < sizeRow; posRowNext++)
+                for (var posRowNext = posRow+1; posRowNext < sizeRow; posRowNext++)
                 {
                     if (!_pieces[posColumn, posRowNext]) continue;
-                        
-                    _pieces[posColumn,posRowNext].MovePiece(posColumn,posRow);
+
+                    _pieces[posColumn, posRowNext].MovePiece(posColumn,posRow);
+                    _pieces[posColumn, posRow] = _pieces[posColumn, posRowNext];
                     _pieces[posColumn, posRowNext] = null;
                     
                     if (!movingPieces.Contains(_pieces[posColumn, posRow]))

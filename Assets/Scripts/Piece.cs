@@ -37,12 +37,12 @@ public class Piece : MonoBehaviour
 
     private void OnMouseDown()
     {
-        _board.startTile = this;
+        if(!_board._swappingPieces) _board.startTile = this;
     }
 
     private void OnMouseOver()
     {
-        _board.endTile = this;
+        if(!_board._swappingPieces) _board.endTile = this;
     }
 
     private void OnMouseUp()

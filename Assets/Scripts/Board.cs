@@ -144,8 +144,29 @@ public class Board : MonoBehaviour
     {
         piecesToClear.ForEach(ClearPieceAt);
         List<int> columnsMatches = GetColumnsMatches(piecesToClear); 
-        CollapseColumns(columnsMatches, 0.5f); 
-        
+        var collapsedPieces = CollapseColumns(columnsMatches);
+        StartCoroutine(FindMatchsRecursively(collapsedPieces));
+    }
+
+    IEnumerator FindMatchsRecursively(List<Piece> collapsedPieces)
+    {
+        yield return new WaitForSeconds(1f);
+
+        var newMatches = new List<Piece>();
+        collapsedPieces.ForEach(piece =>
+        {
+            var pieceMatchs = GetMatchByPiece(piece.posX, piece.posY);
+            
+            if (pieceMatchs.Count <= 0) return;
+            newMatches = newMatches.Union(pieceMatchs).ToList();
+            ClearPieces(pieceMatchs);
+        });
+        if (newMatches.Count>0)
+        {
+            var newCollapsedPieces = CollapseColumns(GetColumnsMatches(newMatches));
+            FindMatchsRecursively(newCollapsedPieces);
+        }
+        yield return null;
     }
 
     private List<int> GetColumnsMatches(List<Piece> piecesOfColumns)
@@ -159,10 +180,9 @@ public class Board : MonoBehaviour
         return columns;
     }
 
-    private void CollapseColumns(List<int> columns, float timeToCollapse)
+    private List<Piece> CollapseColumns(List<int> columns)
     {
         var movingPieces = new List<Piece>();
-
         foreach (var posColumn in columns)
         {
             for (var posRow = 0; posRow < sizeRow; posRow++)
@@ -185,6 +205,7 @@ public class Board : MonoBehaviour
                 }
             }
         }
+        return movingPieces;
     }
 
     private bool IsPosibleMove()

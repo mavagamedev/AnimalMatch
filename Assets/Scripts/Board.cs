@@ -40,7 +40,7 @@ public class Board : MonoBehaviour
         Camera.main!.transform.position = new Vector3(posCameraX,posCameraY,-10);
         
         // Resize Camera
-        var verticalSize = (sizeRow / 2f)+0.5f;
+        var verticalSize = (sizeRow / 2f)+2f;
         Camera.main!.orthographicSize =
             (sizeColumn > verticalSize ? sizeColumn : verticalSize)+sizeOffset;
     }

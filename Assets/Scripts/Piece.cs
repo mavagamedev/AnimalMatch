@@ -35,6 +35,14 @@ public class Piece : MonoBehaviour
         };
     }
 
+    public void RemovePiece()
+    {
+        transform.DORotate(new Vector3(0, 0, -120f), 0.4f);
+        transform.DOScale(Vector3.one * 1.25f, 0.2f).onComplete = 
+            () => transform.DOScale(Vector3.zero, 0.2f).onComplete = 
+                () => Destroy(gameObject);
+    }
+
     private void OnMouseDown()
     {
         if(!_board._swappingPieces) _board.startTile = this;

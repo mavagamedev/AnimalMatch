@@ -1,6 +1,6 @@
 using System;
-using System.Collections;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -16,6 +16,7 @@ public class Board : MonoBehaviour
     [SerializeField] private int sizeRow;
     [SerializeField] private GameObject emptyObject;
     [SerializeField] private GameObject[] animalPieces;
+    [SerializeField] private float timeSetupPieces = 2.0f;
     
     [Header("Swap Pieces")] 
     public Piece startTile;
@@ -28,7 +29,7 @@ public class Board : MonoBehaviour
         _pieces = new Piece[sizeColumn, sizeRow];
         SetupBoard();
         ConfigCamera();
-        SetupPieces();
+        StartCoroutine(SetupPieces(true));
     }
     
     private void ConfigCamera()
@@ -54,49 +55,70 @@ public class Board : MonoBehaviour
             }
         }
     }
-    private void SetupPieces()
+    
+    private IEnumerator SetupPieces(bool timeWait)
     {
         for (var x = 0 ; x < sizeColumn ; x++)
         {
             for (var y = 0 ; y < sizeRow ; y++)
             {
-               CreatePieceAt(x,y);
-               
-               var currIntento = 0;
-               const int maxAttempts = 5;
-               while (HasPreviousMatches(x,y))
-               {
-                   if(currIntento>=maxAttempts) break;
+                yield return new WaitForSeconds(timeWait ? timeSetupPieces/(sizeColumn*sizeRow):0f);
+
+                if (_pieces[x, y]) continue;
+                CreatePieceAt(x,y);
+
+                var currIntento = 0;
+                const int maxAttempts = 5;
+
+                while (HasPreviousMatches(x,y) == true)
+                {
+                    if(currIntento>=maxAttempts) break;
                    
-                   ClearPieceAt(_pieces[x,y]);
-                   CreatePieceAt(x, y);
-                   currIntento++;
-               }
+                    RemovePieceAt(_pieces[x,y]);
+                    CreatePieceAt(x, y);
+                    currIntento++;
+                }
             }
         }
+    }
+
+    private bool HasPreviousMatches(int posX, int posY)
+    {
+        var leftMatchs = GetMatchByDirection(posX, posY, Vector2.left, 2);
+        var downMatchs = GetMatchByDirection(posX, posY, Vector2.down, 2);
+        
+        return leftMatchs.Count > 0 || downMatchs.Count > 0;
     }
 
     private void CreatePieceAt(int posX, int posY)
     {
         var pieceObject =  animalPieces[Random.Range(0, animalPieces.Length)];
         var piece = Instantiate(
-            pieceObject, new Vector2(posX, posY+verticalOffset), Quaternion.identity, transform);
+            pieceObject, new Vector2(posX, posY+2+verticalOffset), Quaternion.identity, transform);
 
         _pieces[posX, posY] = piece.GetComponent<Piece>();
         _pieces[posX, posY]?.SetInformation(posX,posY);
+        _pieces[posX, posY].MovePiece(posX,posY);
     }
 
     private void ClearPieceAt(Piece piece)
+    {
+        piece.RemovePiece();
+        _pieces[piece.posX, piece.posY] = null;
+    }
+
+    private void RemovePieceAt(Piece piece)
     {
         Destroy(piece.gameObject);
         _pieces[piece.posX, piece.posY] = null;
     }
     
-    private bool HasPreviousMatches(int posX, int posY)
+    private bool IsPosibleMove()
     {
-        var leftMatchs = GetMatchByDirection(posX, posY, Vector2.left, 2);
-        var downMatchs = GetMatchByDirection(posX, posY, Vector2.down, 2);
-        return leftMatchs.Count > 0 || downMatchs.Count > 0;
+        var isPosible = (Math.Abs(startTile.posX - endTile.posX) == 1 && startTile.posY == endTile.posY) ||
+                        (Math.Abs(startTile.posY - endTile.posY) == 1 && startTile.posX == endTile.posX);
+        
+        return isPosible;
     }
 
     public IEnumerator SwapPieces()
@@ -122,7 +144,7 @@ public class Board : MonoBehaviour
         
         if (allMatches.Count>0)
         {    
-            ClearPieces(allMatches);
+            StartCoroutine(ClearPieces(allMatches));
         }
         else
         {
@@ -137,18 +159,21 @@ public class Board : MonoBehaviour
         endTile = null;
         _swappingPieces = false;
         
+        
         yield return null; 
     }
 
-    private void ClearPieces(List<Piece> piecesToClear)
+    private IEnumerator ClearPieces(List<Piece> piecesToClear)
     {
         piecesToClear.ForEach(ClearPieceAt);
-        List<int> columnsMatches = GetColumnsMatches(piecesToClear); 
+        var columnsMatches = GetColumnsMatches(piecesToClear);
+        yield return new WaitForSeconds(0.4f);
+        
         var collapsedPieces = CollapseColumns(columnsMatches);
         StartCoroutine(FindMatchsRecursively(collapsedPieces));
     }
 
-    IEnumerator FindMatchsRecursively(List<Piece> collapsedPieces)
+    private IEnumerator FindMatchsRecursively(List<Piece> collapsedPieces)
     {
         yield return new WaitForSeconds(1f);
 
@@ -159,12 +184,17 @@ public class Board : MonoBehaviour
             
             if (pieceMatchs.Count <= 0) return;
             newMatches = newMatches.Union(pieceMatchs).ToList();
-            ClearPieces(pieceMatchs);
+            StartCoroutine(ClearPieces(pieceMatchs));
         });
+        
         if (newMatches.Count>0)
         {
             var newCollapsedPieces = CollapseColumns(GetColumnsMatches(newMatches));
-            FindMatchsRecursively(newCollapsedPieces);
+            yield return FindMatchsRecursively(newCollapsedPieces);
+        }
+        else
+        {
+            StartCoroutine(SetupPieces(false));
         }
         yield return null;
     }
@@ -206,14 +236,6 @@ public class Board : MonoBehaviour
             }
         }
         return movingPieces;
-    }
-
-    private bool IsPosibleMove()
-    {
-        var isPosible = (Math.Abs(startTile.posX - endTile.posX) == 1 && startTile.posY == endTile.posY) ||
-                        (Math.Abs(startTile.posY - endTile.posY) == 1 && startTile.posX == endTile.posX);
-        
-        return isPosible;
     }
 
     private List<Piece> GetMatchByDirection(int piecePosX, int piecePosY, Vector2 direction, int minPieces=3)

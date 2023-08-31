@@ -70,7 +70,7 @@ public class Board : MonoBehaviour
                 var currIntento = 0;
                 const int maxAttempts = 5;
 
-                while (HasPreviousMatches(x,y) == true)
+                while (HasPreviousMatches(x,y))
                 {
                     if(currIntento>=maxAttempts) break;
                    
